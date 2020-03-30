@@ -19,10 +19,10 @@ int chairs[3];
 int number_students_waiting = 0;
 int seating_nextposition = 0;
 int nextposition_teaching = 0;
-int sleeping_FLAG = 0;
+int sleeping_FLAG = 0; // 0 means not sleeping, 1 means sleeping
 
 
-int isNumber(char number[])
+int isNumber(char number[])  // converting into numbers from characters
 {
     int i;
 		for ( i = 0 ; number[i] != 0; i++ )
@@ -33,7 +33,7 @@ int isNumber(char number[])
     return 1;
 }
 
-int isWaiting( int student_id ) {
+int isWaiting( int student_id ) {   // Checks whether students are waiting or not.
 	int i;
 	for ( i = 0; i < 3; i++ ) {
 		if (chairs[i] == student_id ) { return 1; }
@@ -43,16 +43,16 @@ int isWaiting( int student_id ) {
 
 
 
-void* TA() {
+void* TA() {    // This function explains the working of the TA
 
-	printf( "Checking for students.\n" );
+	printf( "Checking the availability of students.\n" );
 
-	while( 1 ) {
+	while( number_students_waiting >= 0 ) {
 
 		//if students are waiting
 		if ( number_students_waiting > 0 ) {
 
-			sleeping_FLAG = 0;
+			sleeping_FLAG = 0;   // TA not sleeping as students are waiting
 			sem_wait( &semphore_students );
 			pthread_mutex_lock( &thread );
 
@@ -63,7 +63,7 @@ void* TA() {
 			printf( "Students %d getting help.\n",chairs[nextposition_teaching] );
 
 			chairs[nextposition_teaching]=0;
-			number_students_waiting--;
+			number_students_waiting--;    // decrementing the count of the students whose doubts have been resolved.
 			nextposition_teaching = ( nextposition_teaching + 1 ) % Waiting_Chairs;
 
 			sleep ( solving_time );
@@ -73,12 +73,12 @@ void* TA() {
 
 		}
 		
-		else {
+		else { // Students are not waiting. Hence, TA will start napping.
 
-			if ( sleeping_FLAG == 0 ) {
+			if ( sleeping_FLAG == 0 ) {  
 
 				printf( " TA sleeping as students are not waiting.\n" );
-				sleeping_FLAG = 1;
+				sleeping_FLAG = 1;  // condition to identify TA is sleeping.
 
 			}
 
@@ -92,7 +92,7 @@ void* Students( void* student_id ) {
 
 	int id_student = *(int*)student_id;
 
-	while( 1 ) {
+	while( id_student ) {
 
 		if ( isWaiting( id_student ) == 1 )    continue; //if Students is waiting, continue waiting
 
@@ -103,7 +103,7 @@ void* Students( void* student_id ) {
 
 		pthread_mutex_lock( &thread );
 
-		if( number_students_waiting < Waiting_Chairs ) {
+		if( number_students_waiting < Waiting_Chairs ) { // this piece of code denotes availability of vacant chairs.
 
 			chairs[seating_nextposition] = id_student;
 			number_students_waiting++;

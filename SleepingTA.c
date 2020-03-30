@@ -56,7 +56,7 @@ void* TA() {
 			sem_wait( &semphore_students );
 			pthread_mutex_lock( &thread );
 
-			int solving_time = rand() % 5;
+			int solving_time = rand() % 4;
 
 			//TA helping Students.
 			printf( "Students getting help for %d seconds. Waiting Time = %d.\n", solving_time, (number_students_waiting - 1) );
@@ -96,8 +96,8 @@ void* Students( void* student_id ) {
 
 		if ( isWaiting( id_student ) == 1 )    continue; //if Students is waiting, continue waiting
 
-		//Students is programming.
-		int time = rand() % 5;
+		//Students are programming.
+		int time = rand() % 4;
 		printf( "\tStudent %d is programming for %d seconds.\n", id_student, time );
 		sleep( time );
 
